@@ -1,5 +1,5 @@
 class NumberedBox extends createjs.Container {
-    constructor(number = 0) {
+    constructor(number=0) {
         super();
 
         var movieclip = new lib.NumberedBox();
@@ -19,17 +19,19 @@ class Game {
 
         this.canvas = document.getElementById("game-canvas");
         this.stage = new createjs.Stage(this.canvas);
+        
+        window.debugStage = this.stage;
 
         createjs.Ticker.framerate = 60;
 
         // keep re-drawing the stage.
         createjs.Ticker.on("tick", this.stage);
 
+        // background
+        this.stage.addChild(new lib.Background());
+
         // testing code
-        var circle = new createjs.Shape();
-        circle.graphics.beginFill("yellow").drawCircle(0,0,40);
-        circle.x = circle.y = 100;
-        this.stage.addChild(circle);
+        this.stage.addChild(new NumberedBox(88));
     }
     version() {
         return '1.0.0';
