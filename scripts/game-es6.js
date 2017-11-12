@@ -7,6 +7,9 @@ class NumberedBox extends createjs.Container {
 
         var movieclip = new lib.NumberedBox();
         movieclip.numberText.text = number;
+        
+        new createjs.ButtonHelper(movieclip, 0, 1, 2, false, new lib.NumberedBox(), 3);
+        
         this.addChild(movieclip);
 
         this.setBounds(0, 0, 50, 50);
@@ -21,7 +24,7 @@ class NumberedBox extends createjs.Container {
 // This class handles the game data
 class GameData {
     constructor() {
-        this.amountOfBox = 20;
+        this.amountOfBox = 5;
         this.resetData();
     }
     resetData() {
@@ -34,8 +37,7 @@ class GameData {
         return (number === this.currentNumber);
     }
     isGameWin() {
-        //todo
-        return false;
+        return (this.currentNumber > this.amountOfBox);
     }
 }
 
@@ -49,6 +51,8 @@ class Game {
         
         this.stage.width = this.canvas.width;
         this.stage.height = this.canvas.height;
+
+        this.stage.enableMouseOver();
 
         // tap or touch
         createjs.Touch.enable(this.stage);
@@ -66,13 +70,17 @@ class Game {
         // keep re-drawing the stage.
         createjs.Ticker.on("tick", this.stage);
 
-        // background
-        this.stage.addChild(new lib.Background());
+        this.restartGame();
 
-        this.generateMultipleBoxes();
     }
     version() {
         return '1.0.0';
+    }
+    restartGame() {
+        this.gameData.resetData();
+        this.stage.removeAllChildren();
+        this.stage.addChild(new lib.Background());
+        this.generateMultipleBoxes(this.gameData.amountOfBox);
     }
     generateMultipleBoxes(amount=10) {
         for (var i = amount; i > 0; i--) {
@@ -88,6 +96,15 @@ class Game {
         if (this.gameData.isRightNumber(numberedBox.number)) {
             this.stage.removeChild(numberedBox);
             this.gameData.nextNumber();
+
+            if (this.gameData.isGameWin()) {
+                var gameOverView = new lib.GameOverView();
+                this.stage.addChild(gameOverView);
+
+                gameOverView.restartButton.on('click', (function(){
+                    this.restartGame();
+                }).bind(this));
+            }
         }
         
     }
